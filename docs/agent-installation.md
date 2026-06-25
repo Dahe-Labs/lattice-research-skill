@@ -124,7 +124,8 @@ Start directly when the task is already clear:
 
 ```text
 Use lattice-find-papers to build a literature pool and request missing PDFs.
-Use lattice-gaps to build data, experiment, and method trees from my PDFs and Zotero records.
+Use lattice-gaps to run compact gap discovery from my PDFs and Zotero records.
+Use lattice-gaps full evidence mapping if I explicitly need data, experiment, and method trees.
 Use lattice-gaps verify-only mode to test whether this proposed gap is real.
 Use lattice-wording to review academic phrasing.
 Use lattice-honesty to audit unsupported claims.

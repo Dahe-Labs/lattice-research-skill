@@ -14,7 +14,7 @@ If your agent does not support automatic skill discovery, read the router first:
 Then follow the relevant child skill:
 
 - `skills/lattice-find-papers/SKILL.md` for literature search, DOI import planning, full-text availability checks, and Request PDF generation.
-- `skills/lattice-gaps/SKILL.md` for data trees, experiment trees, method trees, research-gap discovery, and verify-only Anti-Gap checks.
+- `skills/lattice-gaps/SKILL.md` for compact gap discovery, optional data/experiment/method trees, and verify-only Anti-Gap checks.
 - `skills/lattice-wording/SKILL.md` for academic wording review.
 - `skills/lattice-honesty/SKILL.md` for evidence-bound honesty and overclaim audits.
 

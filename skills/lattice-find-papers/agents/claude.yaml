@@ -1,4 +1,4 @@
 interface:
   display_name: "Lattice Find Papers"
-  short_description: "Find papers, import DOI records, prepare Request PDFs"
-  default_prompt: "Use lattice-find-papers to search papers, audit coverage, import screened DOI records into Zotero when available, and generate request_PDF/doi_list.md for my research topic."
+  short_description: "Find papers and prepare compact Request PDF handoff"
+  default_prompt: "Use lattice-find-papers to search papers, import screened DOI records into Zotero when available, and generate a compact request_PDF/doi_list.md handoff for my research topic."

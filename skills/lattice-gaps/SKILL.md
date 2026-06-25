@@ -1,19 +1,20 @@
 ---
 name: lattice-gaps
-description: Use when the user asks for Lattice Gaps, 找研究空白, data tree/problem tree analysis, project request_PDF evidence, Zotero-backed PDF/full-text reading, parameter assumption drift/collapse, outdated model parameters, pseudo-gap filtering, anti-gap verification, 反研究空白, or direct verification of a proposed gap.
+description: Use when the user asks for Lattice Gaps, compact gap discovery, 找研究空白, project request_PDF evidence, Zotero-backed PDF/full-text reading, parameter assumption drift/collapse, outdated model parameters, pseudo-gap filtering, anti-gap verification, 反研究空白, or direct verification of a proposed gap.
 ---
 
 # Lattice Gaps
 
 ## Overview
 
-Lattice Gaps consumes evidence prepared by Lattice Find Papers and then performs gap discovery or direct Anti-Gap verification. In discovery mode, it builds a project evidence set from local project files, prior Request PDF folders, Lattice Find Papers manifests, and Zotero PDFs/indexed full text when available. It then turns the evidence set into a data tree, a problem tree, a data-problem relation matrix, parameter-drift audits, pseudo-gap red-flag checks, and evidence-bound candidate gaps. Finally it performs open-domain Anti-Gap verification to refute, narrow, or downgrade each candidate before it reaches the final answer.
+Lattice Gaps consumes evidence prepared by Lattice Find Papers and then performs compact gap discovery or direct Anti-Gap verification. The default behavior is a short, high-signal gap audit: evidence boundary, top drift/problem signals, up to three candidate gaps, minimal Anti-Gap checks, and the next smallest action. Full evidence trees and long matrices are optional and only produced when the user explicitly asks for full evidence mapping.
 
 This skill is downstream of Lattice Find Papers. Lattice Find Papers retrieves and screens literature, imports screened DOI records into Zotero when available, generates `runs/<run_id>/request_PDF/doi_list.md`, writes `find_papers_outputs/tables/zotero_import_manifest.csv`, and collects user-downloaded PDFs. Lattice Gaps reads those outputs. It does not import DOI records, export batches, create Zotero collections, or manage Zotero libraries.
 
 ## Modes
 
-- `discovery mode`: use when the user wants to find gaps from project evidence.
+- `compact discovery mode` default: use when the user wants to find gaps from project evidence. Keep the output short enough for manual review.
+- `full evidence mapping mode`: use only when the user explicitly asks for full data tree, problem tree, method tree, data-problem matrix, or a systematic evidence map.
 - `verify-only mode`: use when the user already has one or more proposed gaps and asks for Anti-Gap, 反研究空白, falsification, narrowing, or whether the gap is real. Skip data-tree/problem-tree discovery unless needed to understand the proposed gap.
 
 ## Input Contract
@@ -40,7 +41,7 @@ Read `doi_list.md` and `zotero_import_manifest.csv` as seed and status files, no
 - Local project scope: inspect the project folder and prior Request PDF folders first. Treat local PDFs and supplements as the strongest starting evidence.
 - Zotero read scope: use the Zotero skill/MCP after local inspection. Run readiness checks first; search only by manifest DOI, title, project terms, user-specified collection, or author-year. Use Zotero attachments and indexed full text only when available and relevant to the project.
 - Missing evidence scope: if local files and Zotero do not provide full text, figures/tables, or supplements needed for data/experiment claims, classify the item as an evidence blocker and return it to Lattice Find Papers/Request PDF. Do not perform DOI import inside Lattice Gaps.
-- Anti-Gap verification scope: after candidate gaps are generated, or immediately in verify-only mode, search externally enough to challenge each candidate. Use academic search, publisher pages, review papers, citation chains, adjacent terminology, preprints, databases, benchmarks, standards, and method/protocol literature when available.
+- Anti-Gap verification scope: default to the minimum search needed to challenge each candidate. Check whether the same correction, re-modeling, parameter update, benchmark, or review already exists. Expand into broader academic search only when a candidate survives the first pass or the user asks for a full audit.
 - Final claim scope: do not claim a gap is globally proven absent. State the searched sources, terms, date, and remaining uncertainty.
 
 Evidence levels:
@@ -61,6 +62,8 @@ Parameter values and model assumptions should be treated as strong evidence only
 - Do not use abstracts as full-text evidence.
 - Do not treat online metadata-only fallback as a data/experiment gap proof. It can refute, narrow, or locate evidence during Anti-Gap verification, but it cannot replace full text, figures/tables, supplements, datasets, or methods.
 - Do not produce detailed per-paper literature annotations; use only compact evidence anchors such as filename, page, figure, table, or section.
+- Do not output full data trees, problem trees, relation matrices, or long per-paper tables in compact discovery mode.
+- Do not generate more than three candidate gaps by default. Rank and keep only the highest-value signals.
 - Do not treat "unified framework", "multi-factor coupling", "data normalization", "database/platform", or "more variables" as a gap unless it survives open-domain Anti-Gap verification.
 - Do not treat a numeric difference as a parameter gap until unit, parameter definition, material state, boundary condition, and measurement/modeling method have been checked.
 
@@ -79,8 +82,8 @@ Parameter values and model assumptions should be treated as strong evidence only
    - Use metadata-only or indexed-full-text-only items as evidence-level markers, not as full-text proof.
 
 3. Decide mode.
-   - If the user provides proposed gaps and asks for verification, switch to `verify-only mode` and jump to step 10.
-   - If the user asks for discovery, continue through the full evidence analysis.
+   - If the user provides proposed gaps and asks for verification, switch to `verify-only mode` and jump to Anti-Gap verification.
+   - If the user asks for discovery, use `compact discovery mode` unless they explicitly request full mapping.
    - If evidence is insufficient for discovery, output the missing PDFs/supplements/datasets and route back to Lattice Find Papers or Request PDF.
 
 4. Scan sources by role and evidence level.
@@ -90,21 +93,29 @@ Parameter values and model assumptions should be treated as strong evidence only
    - Online metadata/abstracts: use only for Anti-Gap refutation, narrowing, or locating items that should return to Lattice Find Papers/Request PDF; do not use them for full-text conclusions.
    - Record evidence anchors, not long quotations.
 
-5. Build the data tree.
+5. Build a compact evidence sketch.
+   - Identify only the top 3-5 data/method/experiment nodes that matter for the user's research question.
+   - For defect-focused topics, prioritize defect type, size, depth, density, distribution, measurement method, scale, condition, and outcome.
+   - For parameter-focused topics, prioritize parameter name, value/range, unit, material/system, state variable, boundary condition, measurement/model method, year, and evidence level.
+   - Keep this sketch internal unless it directly supports a candidate gap.
+
+6. Use full trees only when requested.
+   - In full evidence mapping mode, build data tree, problem tree, method tree, and relation matrix.
    - Start from observed objects and data families.
    - For defect-focused topics, organize by defect type, size, depth, length, shape, density, distribution, measurement method, scale, condition, and outcome.
    - For parameter-focused topics, organize by parameter name, value/range, unit, material/system, state variable, boundary condition, measurement/model method, year, and evidence level.
    - Keep variable names measurable and comparable.
 
-6. Build the problem tree.
+7. Build the problem tree only if needed.
    - Split the topic into scientific questions such as starting point, propagation, energy, boundary condition, scale transfer, mechanism, and method visibility.
    - Convert broad topics into testable questions.
+   - In compact mode, keep only the 1-3 questions directly tied to candidate gaps.
 
-7. Build the data-problem relation matrix.
+8. Build the data-problem relation matrix only in full mode.
    - Link data nodes to problem nodes using relation types: supports, contradicts, correlates_with, causes_claimed, modulates, measures, not_reported, incomparable, and only_tested_under.
    - Mark whether each relation is direct evidence, inference, missing evidence, or blocker.
 
-8. Identify candidate gaps inside the evidence set.
+9. Identify candidate gaps inside the evidence set.
    - Missing node: a core variable or mechanism is absent from all readable evidence sources.
    - Weak edge: a relation is claimed but not measured.
    - Contradiction: comparable conditions lead to conflicting claims.
@@ -112,8 +123,10 @@ Parameter values and model assumptions should be treated as strong evidence only
    - Method gap: current methods cannot observe the claimed process.
    - Reporting blocker: missing parameters make comparison impossible.
    - Parameter assumption drift: earlier work uses a fixed/default parameter or narrow range, while later evidence reports a substantially different or state-dependent value that could change model or experimental conclusions.
+   - Rank candidates by disruptive potential, evidence level, condition comparability, and model/experiment impact.
+   - Keep at most three candidates in compact mode.
 
-9. Run the parameter assumption drift audit and pseudo-gap red-flag filter when parameter values matter.
+10. Run the parameter assumption drift audit and pseudo-gap red-flag filter when parameter values matter.
    - Extract old values as ranges when the literature uses ranges, not as a strawman single value. Example: treat Li modulus as 30-50 MPa if that is the practical range, not only 50 MPa.
    - Normalize units and parameter definitions; distinguish Young's modulus, shear modulus, storage modulus, hardness, fitted effective modulus, and model calibration parameters.
    - Compare material state and boundary conditions: volume/SOC, temperature, pressure, strain rate, phase, microstructure, loading path, interface condition, and measurement/model method.
@@ -124,12 +137,13 @@ Parameter values and model assumptions should be treated as strong evidence only
    - If a text file is provided, optionally run `scripts/detect_pseudo_gaps.py` to catch common pseudo-gap phrases before manual evidence review.
    - Rewrite any surviving gap as: "Under boundary condition X, prior models/experiments assumed parameter P in range A, while later evidence reports P as B or state-dependent; it remains untested whether updating P changes conclusion Y."
 
-10. Apply embedded Anti-Gap verification.
+11. Apply embedded Anti-Gap verification.
    - Read `references/PSEUDO_GAP_LIBRARY.md`.
    - Restate each candidate/proposed gap narrowly. Do not broaden it.
-   - Build searches from mechanism terms, variable names, material/system names, boundary conditions, methods, synonyms, abbreviations, adjacent-field terminology, and likely review/benchmark terms.
+   - In compact mode, run only three refutation checks first: same re-modeling/re-interpretation, same parameter or method update, and review/benchmark/protocol evidence that already closes the gap.
+   - Build searches from mechanism terms, variable names, material/system names, boundary conditions, methods, synonyms, abbreviations, adjacent-field terminology, and likely review/benchmark terms when broader checking is needed.
    - For parameter drift, search old parameter names/ranges, new reported values, state variables, model sensitivity terms, "revisited", "updated parameter", "finite element", "calibration", "benchmark", and the specific material/interface.
-   - Search outside the initial evidence set to find prior studies, datasets, validated methods, negative results, reviews, benchmarks, standards, protocols, or preprints that could refute the candidate.
+   - Search outside the initial evidence set only enough to find prior studies, datasets, validated methods, negative results, reviews, benchmarks, standards, protocols, or preprints that could refute the candidate.
    - Record searched sources, exact terms, and search date.
    - Classify as `survives narrowly`, `too broad`, `pseudo-gap`, `evidence blocker`, `not yet falsified after open search`, or `refuted by external evidence`.
    - Rewrite surviving gaps as mechanism-variable-boundary-condition claims.
@@ -150,21 +164,12 @@ Do not invent new gaps in verify-only mode unless the user explicitly asks for n
 
 ## Output Format
 
-Respond in Chinese by default.
+Respond in Chinese by default. Compact discovery and verify-only mode must use this short format:
 
-Use these sections:
+1. `证据边界`: what was read, what is missing, and the current evidence level.
+2. `高价值信号`: at most five signals; use one compact table only when it improves readability.
+3. `候选 Gap`: at most three candidates. For each, give one-sentence definition, why it may hold, and biggest weakness.
+4. `Anti-Gap 快查`: minimum refutation checks and result: `保留`, `降级`, `证据不足`, or `已被反证`.
+5. `下一步最小动作`: 1-3 concrete actions, such as one missing PDF, one supplement, one sensitivity analysis, or one re-modeling check.
 
-1. `模式`: discovery mode or verify-only mode.
-2. `证据集合边界`: project path, request folders inspected, Zotero read status, readable PDFs/full texts, manifest status, and what the evidence set can/cannot prove.
-3. `文献主次分组`: primary vs secondary papers, with one-line roles and evidence level.
-4. `Zotero 读取记录`: Zotero read status, matched item status, indexed-full-text-only items, metadata-only items, and blockers. Do not report import/export actions.
-5. `数据树`: hierarchical bullet tree of data/variables.
-6. `问题树`: concise scientific questions; keep brief when parameter/experiment tables carry the main result.
-7. `数据-问题关系矩阵`: compact table linking data nodes, problem nodes, relation type, evidence state, and anchor.
-8. `参数假设漂移审计`: table with parameter, old range/default, new value/range, fold difference, conditions, evidence level, likely model impact, and judgment.
-9. `伪 gap 红旗`: pseudo-gap red flags from the library and whether each was cleared, downgraded, or still unresolved.
-10. `开放反验证范围`: searched sources, exact terms, date, and known blind spots.
-11. `候选 gap 反验证`: Anti-Gap table with candidate/proposed gap, falsification question, risky evidence, external search result, judgment, and rewrite.
-12. `可暂时保留的研究空白`: only gaps that survive narrowly after open-domain verification.
-13. `被降级的问题`: pseudo-gaps, too-broad claims, refuted claims, and evidence blockers.
-14. `下一步最小验证`: the smallest additional PDF, search branch, Lattice Find Papers rerun, experiment, data extraction, sensitivity analysis, or manual Zotero/PDF action needed to challenge the surviving gaps.
+Full evidence mapping mode may add data tree, problem tree, method tree, relation matrix, and detailed per-paper evidence tables, but only after the user explicitly asks for that expanded output.

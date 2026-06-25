@@ -1,4 +1,4 @@
 interface:
   display_name: "Lattice Gaps"
-  short_description: "Evidence gaps and verify-only Anti-Gap checks"
-  default_prompt: "Use lattice-gaps to read request_PDF, Lattice Find Papers manifests, and matching Zotero PDFs/full text, then discover gaps or run verify-only Anti-Gap checks on proposed gaps."
+  short_description: "Compact evidence gaps and verify-only Anti-Gap checks"
+  default_prompt: "Use lattice-gaps to run compact gap discovery from request_PDF, Lattice Find Papers manifests, and matching Zotero PDFs/full text; keep output short unless I ask for full evidence mapping."

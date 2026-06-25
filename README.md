@@ -29,7 +29,7 @@ Zotero + PDFs + supplements + an Agent Skills-compatible AI agent
 |---|---|
 | `lattice-research-skill` | Router for the Lattice workflow. |
 | `lattice-find-papers` | Searches literature, screens candidates, imports selected DOI records into Zotero, checks full-text availability, and prepares `request_PDF/doi_list.md`. |
-| `lattice-gaps` | Reads `request_PDF`, Zotero PDFs/indexed full text, and Find Papers manifests; builds evidence trees; finds data/method/experiment gaps; supports verify-only Anti-Gap checks. |
+| `lattice-gaps` | Reads `request_PDF`, Zotero PDFs/indexed full text, and Find Papers manifests; defaults to compact gap discovery; supports optional evidence trees and verify-only Anti-Gap checks. |
 | `lattice-wording` | Wording review skill. This is still accumulating rules and examples. |
 | `lattice-honesty` | Evidence-bound honesty and overclaim audit. This and related skills are still being optimized. |
 
@@ -58,6 +58,10 @@ Lattice assumes a Zotero-centered workflow:
 Important evidence rule:
 
 > DOI metadata, abstracts, and web snippets can locate papers or refute broad claims, but they are not full-text evidence for numerical values or experimental procedures.
+
+Default output rule:
+
+> Lattice Gaps uses compact gap discovery by default. Full data trees, problem trees, method trees, and long evidence tables are generated only when the user explicitly asks for full evidence mapping.
 
 ## Zotero Setup Guide
 
