@@ -59,6 +59,14 @@ Important evidence rule:
 
 > DOI metadata, abstracts, and web snippets can locate papers or refute broad claims, but they are not full-text evidence for numerical values or experimental procedures.
 
+## Zotero Setup Guide
+
+Detailed Zotero configuration instructions are maintained separately here:
+
+[Zotero Configuration for Lattice](docs/zotero-configuration.md)
+
+The main page intentionally keeps only this entry point so the setup guide can be updated independently.
+
 ## Installation
 
 Clone this repository and copy the skills into your Codex skills directory:
@@ -91,4 +99,3 @@ Restart Codex or open a new Codex session after installation.
 Lattice does not bypass paywalls and does not claim to read inaccessible PDFs. When full text, figures, tables, or supplementary materials are missing, the correct output is a request or evidence blocker, not a fake conclusion.
 
 No copyrighted PDFs are included in this repository.
-

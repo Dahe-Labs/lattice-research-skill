@@ -27,3 +27,6 @@ For DOI import and local-library evidence checks, keep Zotero Desktop running an
 
 If Zotero is unavailable, Lattice Find Papers can still prepare Request PDF lists, but Lattice Gaps should not treat abstracts or metadata as full-text evidence.
 
+Detailed setup instructions are here:
+
+[Zotero Configuration for Lattice](docs/zotero-configuration.md)
